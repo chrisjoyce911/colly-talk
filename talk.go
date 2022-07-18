@@ -2,17 +2,14 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
 
 func main() {
 
-	/*
-		Set Up Colly With a Target Website
-		Let’s create a function that initializes the collector and then calls the target website.
-		Later, we can extend the function and break it down into subparts based on the requirements.
-	*/
+	var dinosaurs = map[string]string{}
 
 	c := colly.NewCollector(
 		colly.AllowedDomains("wikipedia.org", "en.wikipedia.org"),
@@ -26,13 +23,19 @@ func main() {
 		fmt.Println(e.Text)
 	})
 
+	c.OnHTML("table.wikitable tbody", func(e *colly.HTMLElement) {
+		e.ForEach("tr td:first-child i a", func(_ int, el *colly.HTMLElement) {
+
+			fmt.Printf("%s - %s\n", strings.TrimSpace(el.Text), el.Attr("href"))
+			dinosaurs[strings.TrimSpace(el.Text)] = el.Attr("href")
+		})
+	})
+
 	c.Visit("https://en.wikipedia.org/wiki/List_of_Australian_and_Antarctic_dinosaurs")
 
 	/*
-		The snippet above initializes a collector and restricts it to the Wikipedia domain.
-		We have also attached an
-		* OnRequest to the collector to know when they start running.
-		* OnHTML that will print the page title
-		Finally, we call c.Visit with a URL that opens the article 'List_of_Australian_and_Antarctic_dinosaurs'
+		Get a list of Australian and Antarctic dinosaurs
+		Get link for each dinosaur
 	*/
+
 }
