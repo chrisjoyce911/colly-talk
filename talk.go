@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
@@ -21,19 +22,15 @@ func main() {
 	})
 
 	c.OnHTML("table.wikitable tbody", func(e *colly.HTMLElement) {
-		e.ForEach("tr td:first-child i", func(_ int, td *colly.HTMLElement) {
-			fmt.Println(td.Text)
+
+		e.ForEach("tr td:first-child i a", func(_ int, el *colly.HTMLElement) {
+
+			foundURL := el.Request.AbsoluteURL(el.Attr("href"))
+			fmt.Printf("%s\n\t%s\n\n", strings.TrimSpace(el.Text), foundURL)
+
 		})
 	})
 
 	c.Visit("https://en.wikipedia.org/wiki/List_of_Australian_and_Antarctic_dinosaurs")
-
-	/*
-
-		Developer tools should be totally used. Many times, elements won’t be present with IDs and class names (e.g. Facebook after their new UI update).
-		All elements have randomized classes and IDs. Use XPath for these scenarios.
-
-		Lets get a list of Australian and Antarctic dinosaurs
-	*/
 
 }
