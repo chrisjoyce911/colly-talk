@@ -8,12 +8,6 @@ import (
 
 func main() {
 
-	/*
-		Set Up Colly With a Target Website
-		Let’s create a function that initializes the collector and then calls the target website.
-		Later, we can extend the function and break it down into subparts based on the requirements.
-	*/
-
 	c := colly.NewCollector(
 		colly.AllowedDomains("wikipedia.org", "en.wikipedia.org"),
 	)
@@ -26,13 +20,20 @@ func main() {
 		fmt.Println(e.Text)
 	})
 
+	c.OnHTML("table.wikitable tbody", func(e *colly.HTMLElement) {
+		e.ForEach("tr td:first-child i", func(_ int, td *colly.HTMLElement) {
+			fmt.Println(td.Text)
+		})
+	})
+
 	c.Visit("https://en.wikipedia.org/wiki/List_of_Australian_and_Antarctic_dinosaurs")
 
 	/*
-		The snippet above initializes a collector and restricts it to the Wikipedia domain.
-		We have also attached an
-		* OnRequest to the collector to know when they start running.
-		* OnHTML that will print the page title
-		Finally, we call c.Visit with a URL that opens the article 'List_of_Australian_and_Antarctic_dinosaurs'
+
+		Developer tools should be totally used. Many times, elements won’t be present with IDs and class names (e.g. Facebook after their new UI update).
+		All elements have randomized classes and IDs. Use XPath for these scenarios.
+
+		Lets get a list of Australian and Antarctic dinosaurs
 	*/
+
 }
